@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydraSense – Historique</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>🌊 HydraSense</h1>
+        <p>📊 Historique</p>
+        <a href="javascript:history.back()" class="btn-retour">🔙 Retour</a>
+    </header>
+
+    <div class="historique-page">
+        <div class="graphique-container">
+            <h2>🌡️ Température (°C)</h2>
+            <canvas id="graphTemp"></canvas>
+        </div>
+
+        <div class="graphique-container">
+            <h2>🧪 pH</h2>
+            <canvas id="graphPh"></canvas>
+        </div>
+
+        <div class="graphique-container">
+            <h2>💧 Turbidité (NTU)</h2>
+            <canvas id="graphTurb"></canvas>
+        </div>
+    </div>
+
+    <div class="nav-bas">
+        <a href="/pecheur">🏠 Accueil</a>
+        <a href="/alertes">🔔 Alertes</a>
+        <a href="/historique">📊 Historique</a>
+        <a href="/tuto">💡 Conseils</a>
+    </div>
+
+    <script>
+        const labels = [];
+        const tempData = [];
+        const phData = [];
+        const turbData = [];
+
+        const configTemp = {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Température °C', data: tempData, borderColor: '#ff6b6b', backgroundColor: 'rgba(255,107,107,0.1)', tension: 0.4 }] },
+            options: { scales: { y: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } }, x: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } } }, plugins: { legend: { labels: { color: 'white' } } } }
+        };
+
+        const configPh = {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'pH', data: phData, borderColor: '#00aaff', backgroundColor: 'rgba(0,170,255,0.1)', tension: 0.4 }] },
+            options: { scales: { y: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } }, x: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } } }, plugins: { legend: { labels: { color: 'white' } } } }
+        };
+
+        const configTurb = {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Turbidité NTU', data: turbData, borderColor: '#4cff72', backgroundColor: 'rgba(76,255,114,0.1)', tension: 0.4 }] },
+            options: { scales: { y: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } }, x: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } } }, plugins: { legend: { labels: { color: 'white' } } } }
+        };
+
+        const chartTemp = new Chart(document.getElementById('graphTemp'), configTemp);
+        const chartPh = new Chart(document.getElementById('graphPh'), configPh);
+        const chartTurb = new Chart(document.getElementById('graphTurb'), configTurb);
+
+        function mettreAJourGraphiques() {
+            fetch('/donnees')
+                .then(r => r.json())
+                .then(data => {
+                    const now = new Date().toLocaleTimeString();
+                    if (labels.length > 10) {
+                        labels.shift();
+                        tempData.shift();
+                        phData.shift();
+                        turbData.shift();
+                    }
+                    labels.push(now);
+                    tempData.push(data.temperature);
+                    phData.push(data.ph);
+                    turbData.push(data.turbidite);
+
+                    chartTemp.update();
+                    chartPh.update();
+                    chartTurb.update();
+                });
+        }
+
+        setInterval(mettreAJourGraphiques, 3000);
+        mettreAJourGraphiques();
+    </script>
+</body>
+</html>

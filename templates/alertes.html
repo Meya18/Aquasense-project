@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydraSense – Alertes</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌊 HydraSense</h1>
+        <p>🔔 Alertes</p>
+        <a href="javascript:history.back()" class="btn-retour">🔙 Retour</a>
+    </header>
+
+    <div class="alertes-page">
+        <h2>Alertes récentes</h2>
+
+        <div id="liste-alertes">
+            <!-- Alertes générées dynamiquement -->
+        </div>
+    </div>
+
+    <div class="nav-bas">
+        <a href="/pecheur">🏠 Accueil</a>
+        <a href="/alertes">🔔 Alertes</a>
+        <a href="/historique">📊 Historique</a>
+        <a href="/tuto">💡 Conseils</a>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+    <script>
+        function afficherAlertes() {
+            fetch('/donnees')
+                .then(response => response.json())
+                .then(data => {
+                    const liste = document.getElementById('liste-alertes');
+                    liste.innerHTML = '';
+
+                    const now = new Date().toLocaleTimeString();
+
+                    if (data.temperature < 10 || data.temperature > 28) {
+                        liste.innerHTML += `
+                            <div class="alerte danger">
+                                <span>🔴 Température critique</span>
+                                <span>${data.temperature} °C détectés</span>
+                                <span>${now}</span>
+                            </div>`;
+                    }
+
+                    if (data.ph < 6.5 || data.ph > 8.5) {
+                        liste.innerHTML += `
+                            <div class="alerte danger">
+                                <span>🔴 pH hors norme</span>
+                                <span>${data.ph} détecté</span>
+                                <span>${now}</span>
+                            </div>`;
+                    }
+
+                    if (data.turbidite > 100) {
+                        liste.innerHTML += `
+                            <div class="alerte danger">
+                                <span>🔴 Turbidité élevée</span>
+                                <span>${data.turbidite} NTU détectés</span>
+                                <span>${now}</span>
+                            </div>`;
+                    } else if (data.turbidite > 50) {
+                        liste.innerHTML += `
+                            <div class="alerte attention">
+                                <span>🟡 Turbidité moyenne</span>
+                                <span>${data.turbidite} NTU détectés</span>
+                                <span>${now}</span>
+                            </div>`;
+                    }
+
+                    if (liste.innerHTML === '') {
+                        liste.innerHTML = '<p class="ok-message">✅ Aucune alerte pour le moment.</p>';
+                    }
+                });
+        }
+
+        setInterval(afficherAlertes, 3000);
+        afficherAlertes();
+    </script>
+</body>
+</html>

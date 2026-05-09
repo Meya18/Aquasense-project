@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydraSense – Conseils</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌊 HydraSense</h1>
+        <p>💡 Conseils & Interprétation</p>
+        <a href="javascript:history.back()" class="btn-retour">🔙 Retour</a>
+    </header>
+
+    <div class="tuto-page">
+
+        <div class="conseil-card">
+            <h2>🌡️ Température</h2>
+            <p>Gardez l'eau entre <strong>18 et 22°C</strong> pour assurer le confort des poissons.</p>
+            <div class="conseil-details">
+                <p>🟢 Idéale : 18 – 22°C</p>
+                <p>🟡 Attention : 10 – 18°C ou 22 – 28°C</p>
+                <p>🔴 Danger : moins de 10°C ou plus de 28°C</p>
+            </div>
+            <p class="conseil-info">Une température trop élevée réduit la quantité d'oxygène dans l'eau et cause du stress aux poissons.</p>
+        </div>
+
+        <div class="conseil-card">
+            <h2>🧪 pH</h2>
+            <p>Un pH stable entre <strong>6.5 et 8.5</strong> est essentiel pour éviter le stress et les maladies.</p>
+            <div class="conseil-details">
+                <p>🟢 Idéal : 7 – 8</p>
+                <p>🟡 Attention : 6.5 – 7 ou 8 – 8.5</p>
+                <p>🔴 Danger : moins de 6.5 ou plus de 8.5</p>
+            </div>
+            <p class="conseil-info">Le pH influence aussi la toxicité de certaines substances dans l'eau comme l'ammoniac.</p>
+        </div>
+
+        <div class="conseil-card">
+            <h2>💧 Turbidité</h2>
+            <p>Une eau trouble réduit la lumière et l'oxygène disponible pour les poissons.</p>
+            <div class="conseil-details">
+                <p>🟢 Normale : moins de 50 NTU</p>
+                <p>🟡 Attention : 50 – 100 NTU</p>
+                <p>🔴 Danger : plus de 100 NTU</p>
+            </div>
+            <p class="conseil-info">Une turbidité élevée peut indiquer une pollution ou une prolifération d'algues.</p>
+        </div>
+
+        <div class="conseil-card">
+            <h2>📖 Tutoriel</h2>
+            <p>Découvrez comment fonctionne HydraSense :</p>
+            <ol class="tuto-steps">
+                <li>Les capteurs mesurent pH, température et turbidité en temps réel.</li>
+                <li>L'ESP32 transmet les données via WiFi à l'application.</li>
+                <li>L'application affiche les valeurs et envoie des alertes si nécessaire.</li>
+                <li>Les poissons sont protégés grâce au système d'ultrasons.</li>
+            </ol>
+        </div>
+
+    </div>
+
+    <div class="nav-bas">
+        <a href="/pecheur">🏠 Accueil</a>
+        <a href="/alertes">🔔 Alertes</a>
+        <a href="/historique">📊 Historique</a>
+        <a href="/tuto">💡 Conseils</a>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

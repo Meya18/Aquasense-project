@@ -296,3 +296,98 @@ main {
     background-color: #00aaff;
     color: white;
 }
+/* ALERTES PAGE */
+.alertes-page {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    padding-bottom: 80px;
+}
+
+.alertes-page h2 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.ok-message {
+    color: #4cff72;
+    font-size: 1.1em;
+    text-align: center;
+    padding: 20px;
+}
+
+/* HISTORIQUE PAGE */
+.historique-page {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    padding-bottom: 80px;
+}
+
+.graphique-container {
+    background-color: #0d2244;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #1a4a7a;
+}
+
+.graphique-container h2 {
+    color: #00aaff;
+    margin-bottom: 15px;
+}
+
+/* TUTO PAGE */
+.tuto-page {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    padding-bottom: 80px;
+}
+
+.conseil-card {
+    background-color: #0d2244;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid #1a4a7a;
+}
+
+.conseil-card h2 {
+    color: #00aaff;
+    margin-bottom: 10px;
+}
+
+.conseil-card p {
+    color: #cccccc;
+    margin-bottom: 10px;
+}
+
+.conseil-details {
+    background-color: #0a1628;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.conseil-details p {
+    margin-bottom: 5px;
+    font-size: 0.95em;
+}
+
+.conseil-info {
+    color: #aaaaaa !important;
+    font-size: 0.9em !important;
+    font-style: italic;
+}
+
+.tuto-steps {
+    color: #cccccc;
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.tuto-steps li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
