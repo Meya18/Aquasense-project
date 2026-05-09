@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydraSense – Pêcheur</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌊 HydraSense</h1>
+        <p>Bonjour, Pêcheur ! 🎣</p>
+        <a href="/" class="btn-retour">🔙 Changer de profil</a>
+    </header>
+
+    <div class="qualite-globale">
+        <h2>Qualité de l'eau</h2>
+        <p class="statut ok" id="qualite-globale">Bonne</p>
+        <p id="qualite-message">Tout semble bon pour le moment.</p>
+    </div>
+
+    <main>
+        <div class="carte">
+            <h2>🌡️ Température</h2>
+            <p class="valeur" id="temperature">-- °C</p>
+            <p class="statut" id="statut-temp"></p>
+        </div>
+
+        <div class="carte">
+            <h2>🧪 pH</h2>
+            <p class="valeur" id="ph">--</p>
+            <p class="statut" id="statut-ph"></p>
+        </div>
+
+        <div class="carte">
+            <h2>💧 Turbidité</h2>
+            <p class="valeur" id="turbidite">-- NTU</p>
+            <p class="statut" id="statut-turb"></p>
+        </div>
+    </main>
+
+    <div class="nav-bas">
+        <a href="/pecheur">🏠 Accueil</a>
+        <a href="/alertes">🔔 Alertes</a>
+        <a href="/historique">📊 Historique</a>
+        <a href="/tuto">💡 Conseils</a>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

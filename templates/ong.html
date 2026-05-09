@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydraSense – ONG</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌊 HydraSense</h1>
+        <p>Tableau de bord ONG 🌿</p>
+        <a href="/" class="btn-retour">🔙 Changer de profil</a>
+    </header>
+
+    <div class="qualite-globale">
+        <h2>Qualité globale</h2>
+        <div class="stats-ong">
+            <div class="stat-card">
+                <h3>12</h3>
+                <p>Zones suivies</p>
+            </div>
+            <div class="stat-card">
+                <h3>128</h3>
+                <p>Capteurs actifs</p>
+            </div>
+            <div class="stat-card">
+                <h3>3542</h3>
+                <p>Données (24h)</p>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div class="carte">
+            <h2>🌡️ Température</h2>
+            <p class="valeur" id="temperature">-- °C</p>
+            <p class="statut" id="statut-temp"></p>
+        </div>
+
+        <div class="carte">
+            <h2>🧪 pH</h2>
+            <p class="valeur" id="ph">--</p>
+            <p class="statut" id="statut-ph"></p>
+        </div>
+
+        <div class="carte">
+            <h2>💧 Turbidité</h2>
+            <p class="valeur" id="turbidite">-- NTU</p>
+            <p class="statut" id="statut-turb"></p>
+        </div>
+    </main>
+
+    <div class="alertes-recentes">
+        <h2>🔴 Dernières alertes</h2>
+        <div class="alerte danger">
+            <span>🔴 Rivière Nord</span>
+            <span>Turbidité élevée</span>
+            <span>14:32</span>
+        </div>
+        <div class="alerte danger">
+            <span>🔴 Lac Bleu</span>
+            <span>Température critique</span>
+            <span>13:15</span>
+        </div>
+        <div class="alerte attention">
+            <span>🟡 Étang des Pins</span>
+            <span>pH hors norme</span>
+            <span>11:47</span>
+        </div>
+    </div>
+
+    <div class="nav-bas">
+        <a href="/ong">🏠 Accueil</a>
+        <a href="/alertes">🔔 Alertes</a>
+        <a href="/historique">📊 Historique</a>
+        <a href="/tuto">💡 Conseils</a>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
