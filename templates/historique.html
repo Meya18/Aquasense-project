@@ -6,6 +6,45 @@
     <title>HydraSense – Historique</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .historique-page { padding-bottom: 90px; }
+        .export-btn {
+            display: block;
+            margin: 0 auto 20px;
+            padding: 10px 24px;
+            background: #0077cc;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            max-width: 200px;
+        }
+        .export-btn:hover { background: #005599; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+        th {
+            background: #e8f4fd;
+            color: #0077cc;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 700;
+        }
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e8f0f8;
+            color: #1a2e4a;
+            font-family: monospace;
+        }
+        tr:last-child td { border-bottom: none; }
+    </style>
 </head>
 <body>
 
@@ -16,6 +55,7 @@
     </header>
 
     <div class="historique-page">
+
         <div class="graphique-container">
             <h2>🌡️ Température (°C)</h2>
             <canvas id="graphTemp"></canvas>
@@ -30,6 +70,42 @@
             <h2>💧 Turbidité (NTU)</h2>
             <canvas id="graphTurb"></canvas>
         </div>
+
+        <!-- Tableau des données brutes -->
+        <div class="graphique-container">
+            <h2>📋 Données brutes</h2>
+            <div style="overflow-x:auto;">
+                <table id="tableau-historique">
+                    <thead>
+                        <tr>
+                            <th>Date / Heure</th>
+                            <th>Temp. °C</th>
+                            <th>pH</th>
+                            <th>Turb. NTU</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-historique">
+                        {% if history %}
+                            {% for row in history|reverse %}
+                            <tr>
+                                <td>{{ row.datetime }}</td>
+                                <td>{{ row.temperature }}</td>
+                                <td>{{ row.ph }}</td>
+                                <td>{{ row.turbidite }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="4" style="text-align:center;color:#5a7a9a;padding:20px;">
+                                Aucune donnée enregistrée. Lancez le simulateur ou connectez l'ESP32.
+                            </td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <a href="/export-csv" class="export-btn">📥 Exporter CSV</a>
+
     </div>
 
     <div class="nav-bas">
@@ -40,53 +116,73 @@
     </div>
 
     <script>
-        const labels = [];
+        const labels   = [];
         const tempData = [];
-        const phData = [];
+        const phData   = [];
         const turbData = [];
 
-        const configTemp = {
-            type: 'line',
-            data: { labels, datasets: [{ label: 'Température °C', data: tempData, borderColor: '#ff6b6b', backgroundColor: 'rgba(255,107,107,0.1)', tension: 0.4 }] },
-            options: { scales: { y: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } }, x: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } } }, plugins: { legend: { labels: { color: 'white' } } } }
+        const axesOpts = {
+            scales: {
+                y: { ticks: { color: '#1a2e4a' }, grid: { color: '#ddeeff' } },
+                x: { ticks: { color: '#1a2e4a', maxRotation: 45 }, grid: { color: '#ddeeff' } }
+            },
+            plugins: { legend: { labels: { color: '#1a2e4a' } } },
+            animation: { duration: 250 }
         };
 
-        const configPh = {
+        const chartTemp = new Chart(document.getElementById('graphTemp'), {
             type: 'line',
-            data: { labels, datasets: [{ label: 'pH', data: phData, borderColor: '#00aaff', backgroundColor: 'rgba(0,170,255,0.1)', tension: 0.4 }] },
-            options: { scales: { y: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } }, x: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } } }, plugins: { legend: { labels: { color: 'white' } } } }
-        };
+            data: { labels, datasets: [{
+                label: 'Température °C',
+                data: tempData,
+                borderColor: '#e05252',
+                backgroundColor: 'rgba(224,82,82,0.1)',
+                tension: 0.4, pointRadius: 4, borderWidth: 2
+            }]},
+            options: axesOpts
+        });
 
-        const configTurb = {
+        const chartPh = new Chart(document.getElementById('graphPh'), {
             type: 'line',
-            data: { labels, datasets: [{ label: 'Turbidité NTU', data: turbData, borderColor: '#4cff72', backgroundColor: 'rgba(76,255,114,0.1)', tension: 0.4 }] },
-            options: { scales: { y: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } }, x: { ticks: { color: 'white' }, grid: { color: '#1a4a7a' } } }, plugins: { legend: { labels: { color: 'white' } } } }
-        };
+            data: { labels, datasets: [{
+                label: 'pH',
+                data: phData,
+                borderColor: '#0077cc',
+                backgroundColor: 'rgba(0,119,204,0.1)',
+                tension: 0.4, pointRadius: 4, borderWidth: 2
+            }]},
+            options: axesOpts
+        });
 
-        const chartTemp = new Chart(document.getElementById('graphTemp'), configTemp);
-        const chartPh = new Chart(document.getElementById('graphPh'), configPh);
-        const chartTurb = new Chart(document.getElementById('graphTurb'), configTurb);
+        const chartTurb = new Chart(document.getElementById('graphTurb'), {
+            type: 'line',
+            data: { labels, datasets: [{
+                label: 'Turbidité NTU',
+                data: turbData,
+                borderColor: '#1aaa55',
+                backgroundColor: 'rgba(26,170,85,0.1)',
+                tension: 0.4, pointRadius: 4, borderWidth: 2
+            }]},
+            options: axesOpts
+        });
 
         function mettreAJourGraphiques() {
             fetch('/donnees')
                 .then(r => r.json())
                 .then(data => {
                     const now = new Date().toLocaleTimeString();
-                    if (labels.length > 10) {
-                        labels.shift();
-                        tempData.shift();
-                        phData.shift();
-                        turbData.shift();
+                    if (labels.length >= 15) {
+                        labels.shift(); tempData.shift(); phData.shift(); turbData.shift();
                     }
                     labels.push(now);
                     tempData.push(data.temperature);
                     phData.push(data.ph);
                     turbData.push(data.turbidite);
-
                     chartTemp.update();
                     chartPh.update();
                     chartTurb.update();
-                });
+                })
+                .catch(err => console.warn('Erreur :', err));
         }
 
         setInterval(mettreAJourGraphiques, 3000);

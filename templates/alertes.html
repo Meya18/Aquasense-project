@@ -15,10 +15,30 @@
     </header>
 
     <div class="alertes-page">
-        <h2>Alertes récentes</h2>
+        <h2>Alertes actives</h2>
 
-        <div id="liste-alertes">
-            <!-- Alertes générées dynamiquement -->
+        <!-- Alertes serveur (depuis alertes.json via Flask) -->
+        {% if alertes %}
+            {% for a in alertes %}
+            <div class="alerte {{ a.niveau }}">
+                <span>
+                    {% if a.niveau == 'danger' %}🔴{% else %}🟡{% endif %}
+                    {% if a.type == 'temperature' %}Température
+                    {% elif a.type == 'ph' %}pH
+                    {% elif a.type == 'turbidite' %}Turbidité
+                    {% else %}Alerte{% endif %}
+                </span>
+                <span>{{ a.message }}</span>
+                <span>{{ a.heure }}</span>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Alertes en temps réel (JavaScript) -->
+        <div id="liste-alertes-live"></div>
+
+        <div id="ok-message" style="display:none;" class="ok-message">
+            ✅ Aucune alerte pour le moment. L'eau est saine.
         </div>
     </div>
 
@@ -33,51 +53,54 @@
     <script>
         function afficherAlertes() {
             fetch('/donnees')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    const liste = document.getElementById('liste-alertes');
+                    const liste = document.getElementById('liste-alertes-live');
+                    const ok    = document.getElementById('ok-message');
+                    const now   = new Date().toLocaleTimeString();
                     liste.innerHTML = '';
 
-                    const now = new Date().toLocaleTimeString();
-
                     if (data.temperature < 10 || data.temperature > 28) {
-                        liste.innerHTML += `
-                            <div class="alerte danger">
-                                <span>🔴 Température critique</span>
-                                <span>${data.temperature} °C détectés</span>
-                                <span>${now}</span>
-                            </div>`;
+                        liste.innerHTML += `<div class="alerte danger">
+                            <span>🔴 Température critique</span>
+                            <span>${data.temperature} °C détectés</span>
+                            <span>${now}</span></div>`;
+                    } else if (data.temperature < 18 || data.temperature > 22) {
+                        liste.innerHTML += `<div class="alerte attention">
+                            <span>🟡 Température hors idéal</span>
+                            <span>${data.temperature} °C</span>
+                            <span>${now}</span></div>`;
                     }
 
                     if (data.ph < 6.5 || data.ph > 8.5) {
-                        liste.innerHTML += `
-                            <div class="alerte danger">
-                                <span>🔴 pH hors norme</span>
-                                <span>${data.ph} détecté</span>
-                                <span>${now}</span>
-                            </div>`;
+                        liste.innerHTML += `<div class="alerte danger">
+                            <span>🔴 pH hors norme</span>
+                            <span>${data.ph} détecté</span>
+                            <span>${now}</span></div>`;
+                    } else if (data.ph < 7 || data.ph > 8) {
+                        liste.innerHTML += `<div class="alerte attention">
+                            <span>🟡 pH hors idéal</span>
+                            <span>${data.ph}</span>
+                            <span>${now}</span></div>`;
                     }
 
                     if (data.turbidite > 100) {
-                        liste.innerHTML += `
-                            <div class="alerte danger">
-                                <span>🔴 Turbidité élevée</span>
-                                <span>${data.turbidite} NTU détectés</span>
-                                <span>${now}</span>
-                            </div>`;
+                        liste.innerHTML += `<div class="alerte danger">
+                            <span>🔴 Turbidité critique</span>
+                            <span>${data.turbidite} NTU</span>
+                            <span>${now}</span></div>`;
                     } else if (data.turbidite > 50) {
-                        liste.innerHTML += `
-                            <div class="alerte attention">
-                                <span>🟡 Turbidité moyenne</span>
-                                <span>${data.turbidite} NTU détectés</span>
-                                <span>${now}</span>
-                            </div>`;
+                        liste.innerHTML += `<div class="alerte attention">
+                            <span>🟡 Turbidité élevée</span>
+                            <span>${data.turbidite} NTU</span>
+                            <span>${now}</span></div>`;
                     }
 
-                    if (liste.innerHTML === '') {
-                        liste.innerHTML = '<p class="ok-message">✅ Aucune alerte pour le moment.</p>';
-                    }
-                });
+                    // Afficher "tout va bien" si aucune alerte
+                    const totalAlertes = document.querySelectorAll('.alerte').length;
+                    ok.style.display = (liste.innerHTML === '' && totalAlertes === 0) ? 'block' : 'none';
+                })
+                .catch(err => console.warn('Erreur :', err));
         }
 
         setInterval(afficherAlertes, 3000);

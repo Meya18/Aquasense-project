@@ -16,6 +16,8 @@
 
     <div class="qualite-globale">
         <h2>Qualité globale</h2>
+        <p class="statut ok" id="qualite-globale">🟢 Bonne</p>
+        <p id="qualite-message">Tout semble bon pour le moment.</p>
         <div class="stats-ong">
             <div class="stat-card">
                 <h3>12</h3>
@@ -26,7 +28,7 @@
                 <p>Capteurs actifs</p>
             </div>
             <div class="stat-card">
-                <h3>3542</h3>
+                <h3 id="compteur-donnees">—</h3>
                 <p>Données (24h)</p>
             </div>
         </div>
@@ -53,21 +55,39 @@
     </main>
 
     <div class="alertes-recentes">
-        <h2>🔴 Dernières alertes</h2>
-        <div class="alerte danger">
-            <span>🔴 Rivière Nord</span>
-            <span>Turbidité élevée</span>
-            <span>14:32</span>
+        <h2>🔔 Dernières alertes</h2>
+        <div id="alertes-ong">
+            {% if alertes %}
+                {% for a in alertes %}
+                <div class="alerte {{ a.niveau }}">
+                    <span>{% if a.niveau == 'danger' %}🔴{% else %}🟡{% endif %}
+                        {{ a.type|capitalize }}</span>
+                    <span>{{ a.message }}</span>
+                    <span>{{ a.heure }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alerte attention" id="alerte-demo-1">
+                    <span>🔴 Rivière Nord</span>
+                    <span>Turbidité élevée</span>
+                    <span>14:32</span>
+                </div>
+                <div class="alerte danger" id="alerte-demo-2">
+                    <span>🔴 Lac Bleu</span>
+                    <span>Température critique</span>
+                    <span>13:15</span>
+                </div>
+                <div class="alerte attention" id="alerte-demo-3">
+                    <span>🟡 Étang des Pins</span>
+                    <span>pH hors norme</span>
+                    <span>11:47</span>
+                </div>
+            {% endif %}
         </div>
-        <div class="alerte danger">
-            <span>🔴 Lac Bleu</span>
-            <span>Température critique</span>
-            <span>13:15</span>
-        </div>
-        <div class="alerte attention">
-            <span>🟡 Étang des Pins</span>
-            <span>pH hors norme</span>
-            <span>11:47</span>
+        <div style="margin-top:12px;text-align:center;">
+            <a href="/alertes" class="btn-retour">Voir toutes les alertes →</a>
+            &nbsp;
+            <a href="/historique" class="btn-retour">Voir l'historique →</a>
         </div>
     </div>
 
@@ -79,5 +99,14 @@
     </div>
 
     <script src="/static/js/script.js"></script>
+    <script>
+        // Compteur de données fictif (augmente toutes les 3s)
+        let compteur = 3542;
+        setInterval(() => {
+            compteur++;
+            const el = document.getElementById('compteur-donnees');
+            if (el) el.textContent = compteur;
+        }, 3000);
+    </script>
 </body>
 </html>

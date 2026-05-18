@@ -1,58 +1,93 @@
+// ═══════════════════════════════════════════════
+//  HydraSense — script.js
+//  Mise à jour automatique toutes les 3 secondes
+// ═══════════════════════════════════════════════
+
 function mettreAJour() {
     fetch('/donnees')
         .then(response => response.json())
         .then(data => {
 
-            // Température
-            if (document.getElementById('temperature')) {
-                document.getElementById('temperature').textContent = data.temperature + ' °C';
-                const statutTemp = document.getElementById('statut-temp');
+            // ── Température ──────────────────────────────
+            const elTemp = document.getElementById('temperature');
+            const elStatutTemp = document.getElementById('statut-temp');
+            if (elTemp) elTemp.textContent = data.temperature + ' °C';
+            if (elStatutTemp) {
                 if (data.temperature < 10 || data.temperature > 28) {
-                    statutTemp.textContent = '⚠️ DANGER';
-                    statutTemp.className = 'statut danger';
+                    elStatutTemp.textContent = '⚠️ DANGER';
+                    elStatutTemp.className = 'statut danger';
                 } else if (data.temperature < 18 || data.temperature > 22) {
-                    statutTemp.textContent = '⚠️ Attention';
-                    statutTemp.className = 'statut attention';
+                    elStatutTemp.textContent = '⚠️ Attention';
+                    elStatutTemp.className = 'statut attention';
                 } else {
-                    statutTemp.textContent = '✅ Normal';
-                    statutTemp.className = 'statut ok';
+                    elStatutTemp.textContent = '✅ Normal';
+                    elStatutTemp.className = 'statut ok';
                 }
             }
 
-            // pH
-            if (document.getElementById('ph')) {
-                document.getElementById('ph').textContent = data.ph;
-                const statutPh = document.getElementById('statut-ph');
+            // ── pH ───────────────────────────────────────
+            const elPh = document.getElementById('ph');
+            const elStatutPh = document.getElementById('statut-ph');
+            if (elPh) elPh.textContent = data.ph;
+            if (elStatutPh) {
                 if (data.ph < 6.5 || data.ph > 8.5) {
-                    statutPh.textContent = '⚠️ DANGER';
-                    statutPh.className = 'statut danger';
+                    elStatutPh.textContent = '⚠️ DANGER';
+                    elStatutPh.className = 'statut danger';
                 } else if (data.ph < 7 || data.ph > 8) {
-                    statutPh.textContent = '⚠️ Attention';
-                    statutPh.className = 'statut attention';
+                    elStatutPh.textContent = '⚠️ Attention';
+                    elStatutPh.className = 'statut attention';
                 } else {
-                    statutPh.textContent = '✅ Normal';
-                    statutPh.className = 'statut ok';
+                    elStatutPh.textContent = '✅ Normal';
+                    elStatutPh.className = 'statut ok';
                 }
             }
 
-            // Turbidité
-            if (document.getElementById('turbidite')) {
-                document.getElementById('turbidite').textContent = data.turbidite + ' NTU';
-                const statutTurb = document.getElementById('statut-turb');
+            // ── Turbidité ────────────────────────────────
+            const elTurb = document.getElementById('turbidite');
+            const elStatutTurb = document.getElementById('statut-turb');
+            if (elTurb) elTurb.textContent = data.turbidite + ' NTU';
+            if (elStatutTurb) {
                 if (data.turbidite > 100) {
-                    statutTurb.textContent = '⚠️ DANGER';
-                    statutTurb.className = 'statut danger';
+                    elStatutTurb.textContent = '⚠️ DANGER';
+                    elStatutTurb.className = 'statut danger';
                 } else if (data.turbidite > 50) {
-                    statutTurb.textContent = '⚠️ Attention';
-                    statutTurb.className = 'statut attention';
+                    elStatutTurb.textContent = '⚠️ Attention';
+                    elStatutTurb.className = 'statut attention';
                 } else {
-                    statutTurb.textContent = '✅ Normal';
-                    statutTurb.className = 'statut ok';
+                    elStatutTurb.textContent = '✅ Normal';
+                    elStatutTurb.className = 'statut ok';
                 }
             }
-        });
+
+            // ── Qualité globale (pecheur.html) ───────────
+            const elQualite = document.getElementById('qualite-globale');
+            const elMessage  = document.getElementById('qualite-message');
+            if (elQualite && elMessage) {
+                const danger    = data.temperature < 10 || data.temperature > 28
+                               || data.ph < 6.5 || data.ph > 8.5
+                               || data.turbidite > 100;
+                const attention = data.temperature < 18 || data.temperature > 22
+                               || data.ph < 7 || data.ph > 8
+                               || data.turbidite > 50;
+
+                if (danger) {
+                    elQualite.textContent = '🔴 Mauvaise';
+                    elQualite.className   = 'statut danger';
+                    elMessage.textContent = 'Danger détecté ! Vérifiez les alertes immédiatement.';
+                } else if (attention) {
+                    elQualite.textContent = '🟠 Moyenne';
+                    elQualite.className   = 'statut attention';
+                    elMessage.textContent = "Attention — un paramètre s'approche des limites.";
+                } else {
+                    elQualite.textContent = '🟢 Bonne';
+                    elQualite.className   = 'statut ok';
+                    elMessage.textContent = 'Tout semble bon pour le moment.';
+                }
+            }
+
+        })
+        .catch(err => console.warn('Connexion serveur impossible :', err));
 }
 
-// Mise à jour toutes les 3 secondes
 setInterval(mettreAJour, 3000);
 mettreAJour();

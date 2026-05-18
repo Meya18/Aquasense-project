@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydraSense – Détails</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* ── Onglets ── */
+        .tabs {
+            display: flex;
+            background: #e8f4fd;
+            border-radius: 12px;
+            padding: 4px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            border-radius: 9px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            color: #5a7a9a;
+            transition: all 0.2s;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #0077cc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── Détail page ── */
+        .detail-page {
+            max-width: 800px;
+            margin: 0 auto 80px;
+            padding: 0 20px;
+        }
+        .detail-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,119,204,0.08);
+            border: 1px solid #cce4ff;
+        }
+        .detail-valeur {
+            font-size: 3em;
+            font-weight: bold;
+            color: #1a2e4a;
+            margin: 15px 0 5px;
+        }
+        .detail-unite {
+            font-size: 1.2em;
+            color: #5a7a9a;
+            margin-left: 4px;
+        }
+        .detail-plage {
+            font-size: 0.9em;
+            color: #5a7a9a;
+            margin-bottom: 20px;
+        }
+
+        /* ── Jauge ── */
+        .jauge-container { margin: 15px 0 10px; }
+        .jauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            color: #5a7a9a;
+            margin-bottom: 6px;
+        }
+        .jauge-barre {
+            height: 14px;
+            background: #e8f0f8;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .jauge-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.7s ease;
+        }
+        .jauge-fill.ok      { background: linear-gradient(90deg, #2dc653, #1aab44); }
+        .jauge-fill.attention { background: linear-gradient(90deg, #f4a261, #e07832); }
+        .jauge-fill.danger  { background: linear-gradient(90deg, #e63946, #c1121f); }
+
+        /* ── Info box ── */
+        .info-box {
+            background: #f0f8ff;
+            border-radius: 10px;
+            padding: 15px 18px;
+            font-size: 0.88em;
+            color: #3a5a7a;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+        .seuils-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .seuil-pill {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 600;
+        }
+        .seuil-ok      { background: #e6f9ed; color: #1a7a3a; }
+        .seuil-att     { background: #fff8e0; color: #8a6000; }
+        .seuil-danger  { background: #ffe8e8; color: #cc2200; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌊 HydraSense</h1>
+        <p>📋 Détails des capteurs</p>
+        <a href="javascript:history.back()" class="btn-retour">🔙 Retour</a>
+    </header>
+
+    <!-- Onglets -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="afficherOnglet('temperature', this)">🌡️ Température</button>
+        <button class="tab-btn" onclick="afficherOnglet('ph', this)">🧪 pH</button>
+        <button class="tab-btn" onclick="afficherOnglet('turbidite', this)">💧 Turbidité</button>
+    </div>
+
+    <div class="detail-page">
+
+        <!-- ── Température ── -->
+        <div id="onglet-temperature" class="tab-panel active">
+            <div class="detail-card">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <div style="font-size:0.8em;font-weight:700;color:#5a7a9a;text-transform:uppercase;letter-spacing:1px;">🌡️ Température de l'eau</div>
+                        <div class="detail-valeur">
+                            <span id="val-temp">--</span><span class="detail-unite">°C</span>
+                        </div>
+                        <div class="detail-plage">Plage idéale : <strong>18 – 22 °C</strong></div>
+                    </div>
+                    <span class="statut" id="pill-temp" style="margin-top:6px;"></span>
+                </div>
+
+                <div class="jauge-container">
+                    <div class="jauge-labels"><span>0°C</span><span>Plage idéale</span><span>40°C</span></div>
+                    <div class="jauge-barre">
+                        <div class="jauge-fill ok" id="jauge-temp" style="width:50%;"></div>
+                    </div>
+                </div>
+
+                <div class="seuils-grid">
+                    <span class="seuil-pill seuil-ok">✅ 18–22°C Idéal</span>
+                    <span class="seuil-pill seuil-att">⚠️ 10–18°C ou 22–28°C</span>
+                    <span class="seuil-pill seuil-danger">🔴 &lt;10°C ou &gt;28°C</span>
+                </div>
+            </div>
+            <div class="info-box">
+                ℹ️ Une température trop élevée réduit l'oxygène dissous dans l'eau et provoque du stress chez les poissons. En dessous de 10°C, l'activité biologique ralentit fortement.
+            </div>
+        </div>
+
+        <!-- ── pH ── -->
+        <div id="onglet-ph" class="tab-panel">
+            <div class="detail-card">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <div style="font-size:0.8em;font-weight:700;color:#5a7a9a;text-transform:uppercase;letter-spacing:1px;">🧪 Niveau de pH</div>
+                        <div class="detail-valeur">
+                            <span id="val-ph">--</span>
+                        </div>
+                        <div class="detail-plage">Plage idéale : <strong>7 – 8</strong> (tolérable : 6.5 – 8.5)</div>
+                    </div>
+                    <span class="statut" id="pill-ph" style="margin-top:6px;"></span>
+                </div>
+
+                <div class="jauge-container">
+                    <div class="jauge-labels"><span>0 (acide)</span><span>7 (neutre)</span><span>14 (base)</span></div>
+                    <div class="jauge-barre">
+                        <div class="jauge-fill ok" id="jauge-ph" style="width:50%;"></div>
+                    </div>
+                </div>
+
+                <div class="seuils-grid">
+                    <span class="seuil-pill seuil-ok">✅ 7–8 Idéal</span>
+                    <span class="seuil-pill seuil-att">⚠️ 6.5–7 ou 8–8.5</span>
+                    <span class="seuil-pill seuil-danger">🔴 &lt;6.5 ou &gt;8.5</span>
+                </div>
+            </div>
+            <div class="info-box">
+                ℹ️ Un pH stable entre 6.5 et 8.5 est essentiel pour la vie aquatique. Un pH trop acide (&lt;6) ou trop basique (&gt;9) peut être toxique pour les poissons et endommager leurs branchies.
+            </div>
+        </div>
+
+        <!-- ── Turbidité ── -->
+        <div id="onglet-turbidite" class="tab-panel">
+            <div class="detail-card">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <div style="font-size:0.8em;font-weight:700;color:#5a7a9a;text-transform:uppercase;letter-spacing:1px;">💧 Turbidité</div>
+                        <div class="detail-valeur">
+                            <span id="val-turb">--</span><span class="detail-unite">NTU</span>
+                        </div>
+                        <div class="detail-plage">Idéal : <strong>&lt; 50 NTU</strong></div>
+                    </div>
+                    <span class="statut" id="pill-turb" style="margin-top:6px;"></span>
+                </div>
+
+                <div class="jauge-container">
+                    <div class="jauge-labels"><span>0 NTU</span><span>Seuils</span><span>120 NTU</span></div>
+                    <div class="jauge-barre">
+                        <div class="jauge-fill ok" id="jauge-turb" style="width:10%;"></div>
+                    </div>
+                </div>
+
+                <div class="seuils-grid">
+                    <span class="seuil-pill seuil-ok">✅ &lt;50 NTU Normal</span>
+                    <span class="seuil-pill seuil-att">⚠️ 50–100 NTU Élevé</span>
+                    <span class="seuil-pill seuil-danger">🔴 &gt;100 NTU Critique</span>
+                </div>
+            </div>
+            <div class="info-box">
+                ℹ️ Une eau trouble réduit la lumière disponible et l'oxygène dissous. Elle peut indiquer la présence de sédiments, d'algues ou de polluants. Une turbidité élevée est nuisible à la faune aquatique.
+            </div>
+        </div>
+
+    </div><!-- fin detail-page -->
+
+    <div class="nav-bas">
+        <a href="/pecheur">🏠 Accueil</a>
+        <a href="/alertes">🔔 Alertes</a>
+        <a href="/historique">📊 Historique</a>
+        <a href="/tuto">💡 Conseils</a>
+    </div>
+
+    <script>
+        // ── Gestion des onglets ──────────────────────────
+        function afficherOnglet(nom, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('onglet-' + nom).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ── Mise à jour des valeurs ──────────────────────
+        function mettreAJourDetails() {
+            fetch('/donnees')
+                .then(r => r.json())
+                .then(data => {
+
+                    // Température
+                    document.getElementById('val-temp').textContent = data.temperature;
+                    const jauge_t = document.getElementById('jauge-temp');
+                    const pill_t  = document.getElementById('pill-temp');
+                    const pct_t   = Math.min(Math.round(data.temperature / 40 * 100), 100);
+                    jauge_t.style.width = pct_t + '%';
+                    if (data.temperature < 10 || data.temperature > 28) {
+                        jauge_t.className = 'jauge-fill danger';
+                        pill_t.textContent = '⚠️ DANGER'; pill_t.className = 'statut danger';
+                    } else if (data.temperature < 18 || data.temperature > 22) {
+                        jauge_t.className = 'jauge-fill attention';
+                        pill_t.textContent = '⚠️ Attention'; pill_t.className = 'statut attention';
+                    } else {
+                        jauge_t.className = 'jauge-fill ok';
+                        pill_t.textContent = '✅ Normal'; pill_t.className = 'statut ok';
+                    }
+
+                    // pH
+                    document.getElementById('val-ph').textContent = data.ph;
+                    const jauge_ph = document.getElementById('jauge-ph');
+                    const pill_ph  = document.getElementById('pill-ph');
+                    const pct_ph   = Math.min(Math.round(data.ph / 14 * 100), 100);
+                    jauge_ph.style.width = pct_ph + '%';
+                    if (data.ph < 6.5 || data.ph > 8.5) {
+                        jauge_ph.className = 'jauge-fill danger';
+                        pill_ph.textContent = '⚠️ DANGER'; pill_ph.className = 'statut danger';
+                    } else if (data.ph < 7 || data.ph > 8) {
+                        jauge_ph.className = 'jauge-fill attention';
+                        pill_ph.textContent = '⚠️ Attention'; pill_ph.className = 'statut attention';
+                    } else {
+                        jauge_ph.className = 'jauge-fill ok';
+                        pill_ph.textContent = '✅ Normal'; pill_ph.className = 'statut ok';
+                    }
+
+                    // Turbidité
+                    document.getElementById('val-turb').textContent = data.turbidite;
+                    const jauge_tb = document.getElementById('jauge-turb');
+                    const pill_tb  = document.getElementById('pill-turb');
+                    const pct_tb   = Math.min(Math.round(data.turbidite / 120 * 100), 100);
+                    jauge_tb.style.width = pct_tb + '%';
+                    if (data.turbidite > 100) {
+                        jauge_tb.className = 'jauge-fill danger';
+                        pill_tb.textContent = '⚠️ DANGER'; pill_tb.className = 'statut danger';
+                    } else if (data.turbidite > 50) {
+                        jauge_tb.className = 'jauge-fill attention';
+                        pill_tb.textContent = '⚠️ Attention'; pill_tb.className = 'statut attention';
+                    } else {
+                        jauge_tb.className = 'jauge-fill ok';
+                        pill_tb.textContent = '✅ Normal'; pill_tb.className = 'statut ok';
+                    }
+                })
+                .catch(err => console.warn('Erreur :', err));
+        }
+
+        setInterval(mettreAJourDetails, 3000);
+        mettreAJourDetails();
+    </script>
+</body>
+</html>
