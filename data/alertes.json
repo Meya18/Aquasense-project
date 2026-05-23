@@ -2,13 +2,19 @@
   {
     "type": "temperature",
     "niveau": "attention",
-    "message": "Temperature hors plage ideale : 23.4C",
-    "heure": "09:37"
+    "message": "Temperature hors plage ideale : 27.8C",
+    "heure": "09:39"
+  },
+  {
+    "type": "ph",
+    "niveau": "attention",
+    "message": "pH hors plage ideale : 6.8",
+    "heure": "09:39"
   },
   {
     "type": "turbidite",
     "niveau": "attention",
-    "message": "Turbidite elevee : 95.4 NTU",
-    "heure": "09:37"
+    "message": "Turbidite elevee : 80.5 NTU",
+    "heure": "09:39"
   }
 ]
