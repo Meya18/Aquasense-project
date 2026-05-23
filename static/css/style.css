@@ -126,22 +126,27 @@ header p {
 
 /* DASHBOARD */
 main {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
     padding: 40px;
-    flex-wrap: wrap;
     padding-bottom: 100px;
 }
 
 .carte {
-    background-color: white;
-    border-radius: 15px;
-    padding: 35px;
-    width: 250px;
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 119, 204, 0.1);
-    border: 1px solid #cce4ff;
+
+    box-shadow: 0 8px 25px rgba(0, 119, 204, 0.08);
+    border: 1px solid #e3f0ff;
+
+    transition: transform 0.2s ease;
+}
+
+.carte:hover {
+    transform: translateY(-3px);
 }
 
 .carte h2 {
@@ -151,17 +156,19 @@ main {
 }
 
 .valeur {
-    font-size: 2.5em;
+    font-size: 2.3em;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin: 10px 0;
     color: #1a2e4a;
 }
 
 .statut {
-    font-size: 0.95em;
+    display: inline-block;
+    font-size: 0.9em;
     font-weight: bold;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-radius: 20px;
+    margin-top: 10px;
 }
 
 .ok { background-color: #e6f9ed; color: #1a7a3a; }
@@ -392,4 +399,75 @@ main {
 .tuto-steps li {
     margin-bottom: 10px;
     line-height: 1.6;
+}
+
+.carte-map {
+    grid-column: 1 / -1;
+
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e3f0ff;
+}
+
+main .carte-map {
+    margin-top: 15px;
+}
+
+.carte-map h2 {
+    text-align: center;
+    color: #0077cc;
+    margin-bottom: 15px;
+}
+
+body {
+    padding-bottom: 80px;
+}
+
+
+.nav-bas {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    padding: 12px 10px;
+
+    background-color: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    border-top: 1px solid #cce4ff;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+
+    z-index: 9999;
+}
+
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+@media (max-width: 900px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ok {
+    background-color: #e6f9ed;
+    color: #1a7a3a;
+}
+
+.attention {
+    background-color: #fff8e0;
+    color: #8a6000;
+}
+
+.danger {
+    background-color: #ffe8e8;
+    color: #cc2200;
 }

@@ -103,3 +103,16 @@ new Notification("⚠️ AquaSense", {
 
 const audio = new Audio('/static/alert.mp3');
 audio.play();
+
+zones.forEach(pos => {
+    L.circle(pos, {
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.3,
+        radius: 4000
+    }).addTo(map);
+});
+
+if (color === "red") {
+    new Notification("⚠️ Zone polluée détectée !");
+}
