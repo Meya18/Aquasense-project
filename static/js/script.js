@@ -91,3 +91,15 @@ function mettreAJour() {
 
 setInterval(mettreAJour, 3000);
 mettreAJour();
+
+if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
+
+new Notification("⚠️ AquaSense", {
+    body: "Température critique détectée !",
+    icon: "/static/img/warning.png"
+});
+
+const audio = new Audio('/static/alert.mp3');
+audio.play();
