@@ -137,7 +137,7 @@
                 data: tempData,
                 borderColor: '#e05252',
                 backgroundColor: 'rgba(224,82,82,0.1)',
-                tension: 0.4, pointRadius: 4, borderWidth: 2
+                tension: 0.4, pointRadius: 3, borderWidth: 2
             }]},
             options: axesOpts
         });
@@ -149,7 +149,7 @@
                 data: phData,
                 borderColor: '#0077cc',
                 backgroundColor: 'rgba(0,119,204,0.1)',
-                tension: 0.4, pointRadius: 4, borderWidth: 2
+                tension: 0.4, pointRadius: 3, borderWidth: 2
             }]},
             options: axesOpts
         });
@@ -161,17 +161,38 @@
                 data: turbData,
                 borderColor: '#1aaa55',
                 backgroundColor: 'rgba(26,170,85,0.1)',
-                tension: 0.4, pointRadius: 4, borderWidth: 2
+                tension: 0.4, pointRadius: 3, borderWidth: 2
             }]},
             options: axesOpts
         });
 
+        // ── Charger l'historique CSV au démarrage ──
+        function chargerHistorique() {
+            fetch('/historique-data')
+                .then(r => r.json())
+                .then(rows => {
+                    // Prendre les 30 dernières entrées
+                    const data = rows.slice(-30);
+                    data.forEach(row => {
+                        labels.push(row.datetime ? row.datetime.slice(11, 16) : '');
+                        tempData.push(parseFloat(row.temperature));
+                        phData.push(parseFloat(row.ph));
+                        turbData.push(parseFloat(row.turbidite));
+                    });
+                    chartTemp.update();
+                    chartPh.update();
+                    chartTurb.update();
+                })
+                .catch(err => console.warn('Historique non disponible :', err));
+        }
+
+        // ── Ajouter les nouvelles mesures en live ──
         function mettreAJourGraphiques() {
             fetch('/donnees')
                 .then(r => r.json())
                 .then(data => {
                     const now = new Date().toLocaleTimeString();
-                    if (labels.length >= 15) {
+                    if (labels.length >= 30) {
                         labels.shift(); tempData.shift(); phData.shift(); turbData.shift();
                     }
                     labels.push(now);
@@ -185,8 +206,9 @@
                 .catch(err => console.warn('Erreur :', err));
         }
 
+        // Charger d'abord l'historique, puis démarrer le live
+        chargerHistorique();
         setInterval(mettreAJourGraphiques, 3000);
-        mettreAJourGraphiques();
     </script>
 </body>
 </html>

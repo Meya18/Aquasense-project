@@ -3,61 +3,484 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HydraSense – Conseils</title>
+    <title>AquaSense – Conseils</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'DM Sans', sans-serif; }
+
+        .tuto-page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 30px 20px 100px;
+        }
+
+        /* ── Hero ── */
+        .tuto-hero {
+            background: linear-gradient(135deg, #0077cc 0%, #00aaff 60%, #00d4ff 100%);
+            border-radius: 20px;
+            padding: 35px 30px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tuto-hero::before {
+            content: '🌊';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 6em;
+            opacity: 0.15;
+        }
+        .tuto-hero h2 { font-family: 'Syne', sans-serif; font-size: 1.8em; margin-bottom: 8px; }
+        .tuto-hero p { font-size: 0.95em; opacity: 0.9; max-width: 500px; line-height: 1.6; }
+
+        /* ── Onglets navigation ── */
+        .tabs {
+            display: flex;
+            background: #e8f4fd;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            gap: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            border: none;
+            background: transparent;
+            padding: 10px 8px;
+            border-radius: 9px;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+            color: #5a7a9a;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #0077cc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── Section titres ── */
+        .section-titre {
+            font-family: 'Syne', sans-serif;
+            font-size: 1em;
+            color: #5a7a9a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 30px 0 15px;
+        }
+
+        /* ── Cards génériques ── */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #cce4ff;
+            box-shadow: 0 4px 16px rgba(0,119,204,0.07);
+            margin-bottom: 16px;
+        }
+        .card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.05em;
+            color: #0077cc;
+            margin-bottom: 10px;
+        }
+        .card p, .card li {
+            font-size: 0.88em;
+            color: #3a5a7a;
+            line-height: 1.7;
+        }
+        .card ul, .card ol { padding-left: 18px; margin-top: 8px; }
+        .card li { margin-bottom: 6px; }
+
+        /* ── Capteur cards ── */
+        .capteur-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .capteur-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid #cce4ff;
+            box-shadow: 0 4px 16px rgba(0,119,204,0.07);
+        }
+        .cap-icon { font-size: 2em; margin-bottom: 10px; display: block; }
+        .capteur-card h3 { font-family: 'Syne', sans-serif; font-size: 1.05em; color: #0077cc; margin-bottom: 6px; }
+        .cap-desc { font-size: 0.85em; color: #5a7a9a; line-height: 1.6; margin-bottom: 14px; }
+        .seuils { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+        .seuil-row {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.82em; padding: 6px 10px; border-radius: 8px;
+        }
+        .seuil-row.ok     { background: #e6f9ed; color: #1a7a3a; }
+        .seuil-row.att    { background: #fff8e0; color: #8a6000; }
+        .seuil-row.danger { background: #ffe8e8; color: #cc2200; }
+        .seuil-row .val   { font-weight: 700; margin-right: 4px; }
+        .cap-info {
+            padding: 10px 12px; background: #f0f8ff; border-radius: 8px;
+            font-size: 0.81em; color: #3a5a7a; line-height: 1.6;
+            border-left: 3px solid #0077cc; margin-bottom: 12px;
+        }
+        .cap-actions { margin-top: 12px; }
+        .cap-actions h4 { font-size: 0.85em; font-weight: 700; color: #1a2e4a; margin-bottom: 6px; }
+        .action-item {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 0.82em; color: #3a5a7a; margin-bottom: 5px; line-height: 1.5;
+        }
+
+        /* ── Steps ── */
+        .steps-container { display: flex; flex-direction: column; }
+        .step { display: flex; gap: 20px; align-items: flex-start; position: relative; }
+        .step:not(:last-child)::after {
+            content: ''; position: absolute; left: 19px; top: 44px;
+            width: 2px; height: calc(100% - 10px);
+            background: linear-gradient(to bottom, #0077cc, #cce4ff);
+        }
+        .step-num {
+            width: 40px; height: 40px; min-width: 40px;
+            background: linear-gradient(135deg, #0077cc, #00aaff);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; color: white;
+            font-family: 'Syne', sans-serif; font-size: 1em; font-weight: 800;
+            box-shadow: 0 4px 12px rgba(0,119,204,0.3); z-index: 1;
+        }
+        .step-content {
+            background: white; border-radius: 14px; padding: 16px 20px;
+            margin-bottom: 16px; flex: 1; border: 1px solid #cce4ff;
+            box-shadow: 0 3px 12px rgba(0,119,204,0.06);
+        }
+        .step-content h4 { font-family: 'Syne', sans-serif; color: #0077cc; margin-bottom: 5px; font-size: 0.95em; }
+        .step-content p { font-size: 0.86em; color: #5a7a9a; line-height: 1.6; }
+
+        /* ── FAQ ── */
+        .faq-item { background: white; border-radius: 14px; border: 1px solid #cce4ff; margin-bottom: 10px; overflow: hidden; }
+        .faq-question {
+            padding: 15px 20px; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center;
+            font-weight: 600; color: #1a2e4a; font-size: 0.9em; user-select: none;
+        }
+        .faq-question:hover { background: #f0f8ff; }
+        .faq-arrow { color: #0077cc; transition: transform 0.3s; font-style: normal; }
+        .faq-item.open .faq-arrow { transform: rotate(180deg); }
+        .faq-reponse { display: none; padding: 0 20px 15px; font-size: 0.86em; color: #5a7a9a; line-height: 1.7; }
+        .faq-item.open .faq-reponse { display: block; }
+
+        /* ── Alerte banner ── */
+        .banner {
+            border-radius: 16px; padding: 22px 26px; color: white;
+            display: flex; align-items: center; gap: 18px; margin-bottom: 16px;
+        }
+        .banner.bleu { background: linear-gradient(135deg, #1a2e4a, #0077cc); }
+        .banner.vert { background: linear-gradient(135deg, #1a7a3a, #2dc653); }
+        .banner.rouge { background: linear-gradient(135deg, #7a1a1a, #cc2200); }
+        .banner-icon { font-size: 2.2em; }
+        .banner h4 { font-family: 'Syne', sans-serif; margin-bottom: 4px; font-size: 1em; }
+        .banner p { font-size: 0.85em; opacity: 0.88; line-height: 1.6; }
+
+        /* ── Conseil pêche ── */
+        .conseil-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+        .conseil-mini {
+            background: white; border-radius: 14px; padding: 18px 20px;
+            border: 1px solid #cce4ff; box-shadow: 0 3px 12px rgba(0,119,204,0.06);
+        }
+        .conseil-mini .cm-icon { font-size: 1.8em; margin-bottom: 8px; display: block; }
+        .conseil-mini h4 { font-family: 'Syne', sans-serif; color: #0077cc; font-size: 0.95em; margin-bottom: 6px; }
+        .conseil-mini p { font-size: 0.83em; color: #5a7a9a; line-height: 1.6; }
+    </style>
 </head>
 <body>
 
     <header>
-        <h1>🌊 HydraSense</h1>
-        <p>💡 Conseils & Interprétation</p>
+        <img src="/static/images/icons/logo.png" alt="AquaSense" style="height: 40px;">
+        <p>💡 Conseils & Guide</p>
         <a href="javascript:history.back()" class="btn-retour">🔙 Retour</a>
     </header>
 
     <div class="tuto-page">
 
-        <div class="conseil-card">
-            <h2>🌡️ Température</h2>
-            <p>Gardez l'eau entre <strong>18 et 22°C</strong> pour assurer le confort des poissons.</p>
-            <div class="conseil-details">
-                <p>🟢 Idéale : 18 – 22°C</p>
-                <p>🟡 Attention : 10 – 18°C ou 22 – 28°C</p>
-                <p>🔴 Danger : moins de 10°C ou plus de 28°C</p>
-            </div>
-            <p class="conseil-info">Une température trop élevée réduit la quantité d'oxygène dans l'eau et cause du stress aux poissons.</p>
+        <!-- Hero -->
+        <div class="tuto-hero">
+            <h2>Guide AquaSense</h2>
+            <p>Conseils pratiques, interprétation des données et tutoriel d'utilisation pour protéger la vie aquatique.</p>
         </div>
 
-        <div class="conseil-card">
-            <h2>🧪 pH</h2>
-            <p>Un pH stable entre <strong>6.5 et 8.5</strong> est essentiel pour éviter le stress et les maladies.</p>
-            <div class="conseil-details">
-                <p>🟢 Idéal : 7 – 8</p>
-                <p>🟡 Attention : 6.5 – 7 ou 8 – 8.5</p>
-                <p>🔴 Danger : moins de 6.5 ou plus de 8.5</p>
-            </div>
-            <p class="conseil-info">Le pH influence aussi la toxicité de certaines substances dans l'eau comme l'ammoniac.</p>
+        <!-- Onglets -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="afficherOnglet('capteurs', this)">📊 Capteurs</button>
+            <button class="tab-btn" onclick="afficherOnglet('actions', this)">🚨 Que faire ?</button>
+            <button class="tab-btn" onclick="afficherOnglet('peche', this)">🎣 Conseils pêche</button>
+            <button class="tab-btn" onclick="afficherOnglet('tuto', this)">📱 Tutoriel app</button>
+            <button class="tab-btn" onclick="afficherOnglet('faq', this)">❓ FAQ</button>
         </div>
 
-        <div class="conseil-card">
-            <h2>💧 Turbidité</h2>
-            <p>Une eau trouble réduit la lumière et l'oxygène disponible pour les poissons.</p>
-            <div class="conseil-details">
-                <p>🟢 Normale : moins de 50 NTU</p>
-                <p>🟡 Attention : 50 – 100 NTU</p>
-                <p>🔴 Danger : plus de 100 NTU</p>
+        <!-- ── ONGLET CAPTEURS ── -->
+        <div id="onglet-capteurs" class="tab-panel active">
+            <div class="section-titre">📊 Comprendre les capteurs</div>
+            <div class="capteur-grid">
+
+                <div class="capteur-card">
+                    <span class="cap-icon">🌡️</span>
+                    <h3>Température</h3>
+                    <p class="cap-desc">La température influence directement la quantité d'oxygène dissous et le métabolisme des poissons.</p>
+                    <div class="seuils">
+                        <div class="seuil-row ok"><span>🟢</span><span class="val">18 – 22°C</span> Idéal</div>
+                        <div class="seuil-row att"><span>🟡</span><span class="val">10–18 / 22–28°C</span> Attention</div>
+                        <div class="seuil-row danger"><span>🔴</span><span class="val">&lt;10 / &gt;28°C</span> Danger</div>
+                    </div>
+                    <div class="cap-info">Au-delà de 28°C, l'eau perd rapidement son oxygène. En dessous de 10°C, l'activité biologique ralentit fortement.</div>
+                </div>
+
+                <div class="capteur-card">
+                    <span class="cap-icon">🧪</span>
+                    <h3>pH</h3>
+                    <p class="cap-desc">Le pH mesure l'acidité de l'eau. Un déséquilibre affecte les branchies et le système immunitaire des poissons.</p>
+                    <div class="seuils">
+                        <div class="seuil-row ok"><span>🟢</span><span class="val">7.0 – 8.0</span> Idéal</div>
+                        <div class="seuil-row att"><span>🟡</span><span class="val">6.5–7 / 8–8.5</span> Attention</div>
+                        <div class="seuil-row danger"><span>🔴</span><span class="val">&lt;6.5 / &gt;8.5</span> Danger</div>
+                    </div>
+                    <div class="cap-info">Un pH acide (&lt;6) augmente la toxicité de l'ammoniac. Un pH basique (&gt;9) brûle les branchies des poissons.</div>
+                </div>
+
+                <div class="capteur-card">
+                    <span class="cap-icon">💧</span>
+                    <h3>Turbidité</h3>
+                    <p class="cap-desc">La turbidité mesure la clarté de l'eau. Une eau trouble réduit la lumière et l'oxygène disponibles.</p>
+                    <div class="seuils">
+                        <div class="seuil-row ok"><span>🟢</span><span class="val">&lt; 50 NTU</span> Eau claire</div>
+                        <div class="seuil-row att"><span>🟡</span><span class="val">50–100 NTU</span> Trouble</div>
+                        <div class="seuil-row danger"><span>🔴</span><span class="val">&gt;100 NTU</span> Critique</div>
+                    </div>
+                    <div class="cap-info">Une turbidité élevée peut indiquer une pollution, des algues en prolifération ou des sédiments en suspension.</div>
+                </div>
+
             </div>
-            <p class="conseil-info">Une turbidité élevée peut indiquer une pollution ou une prolifération d'algues.</p>
         </div>
 
-        <div class="conseil-card">
-            <h2>📖 Tutoriel</h2>
-            <p>Découvrez comment fonctionne HydraSense :</p>
-            <ol class="tuto-steps">
-                <li>Les capteurs mesurent pH, température et turbidité en temps réel.</li>
-                <li>L'ESP32 transmet les données via WiFi à l'application.</li>
-                <li>L'application affiche les valeurs et envoie des alertes si nécessaire.</li>
-                <li>Les poissons sont protégés grâce au système d'ultrasons.</li>
-            </ol>
+        <!-- ── ONGLET QUE FAIRE ── -->
+        <div id="onglet-actions" class="tab-panel">
+            <div class="section-titre">🚨 Que faire en cas d'alerte ?</div>
+
+            <div class="banner rouge">
+                <div class="banner-icon">🌡️</div>
+                <div>
+                    <h4>Température critique (&lt;10°C ou &gt;28°C)</h4>
+                    <p>Éloignez immédiatement les poissons de la zone. Vérifiez les sources de chaleur ou de froid à proximité (déversements industriels, canicule). Contactez les autorités environnementales si la cause est inconnue.</p>
+                </div>
+            </div>
+
+            <div class="banner rouge">
+                <div class="banner-icon">🧪</div>
+                <div>
+                    <h4>pH hors norme (&lt;6.5 ou &gt;8.5)</h4>
+                    <p>Cessez toute activité de pêche dans la zone. Un pH anormal peut indiquer un déversement chimique ou une pollution agricole. Signalez à l'OFB (Office Français de la Biodiversité) au 0800 006 020.</p>
+                </div>
+            </div>
+
+            <div class="banner rouge">
+                <div class="banner-icon">💧</div>
+                <div>
+                    <h4>Turbidité critique (&gt;100 NTU)</h4>
+                    <p>Évitez la zone de pêche. Une turbidité très élevée peut asphyxier les poissons. Cherchez la source en amont : travaux, ruissellement agricole, algues. Documentez avec des photos et signalez.</p>
+                </div>
+            </div>
+
+            <div class="section-titre">✅ Bonnes pratiques générales</div>
+            <div class="card">
+                <h3>🔔 Surveiller régulièrement</h3>
+                <ul>
+                    <li>Consultez la page <strong>Alertes</strong> avant chaque sortie de pêche.</li>
+                    <li>Vérifiez l'<strong>Historique</strong> pour détecter des tendances anormales sur plusieurs jours.</li>
+                    <li>En cas de valeurs borderline, attendez que les paramètres reviennent à la normale.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>📞 Contacts utiles</h3>
+                <ul>
+                    <li>🏛️ <strong>OFB</strong> (Office Français de la Biodiversité) : 0800 006 020</li>
+                    <li>🚒 <strong>Pompiers</strong> (pollution grave) : 18</li>
+                    <li>🌊 <strong>Agence de l'eau</strong> : signalement en ligne sur eau-france.fr</li>
+                    <li>🐟 <strong>Fédération de pêche locale</strong> : contacter votre AAPPMA</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ── ONGLET CONSEILS PÊCHE ── -->
+        <div id="onglet-peche" class="tab-panel">
+            <div class="section-titre">🎣 Conseils pour les pêcheurs</div>
+
+            <div class="banner vert">
+                <div class="banner-icon">🌅</div>
+                <div>
+                    <h4>Meilleures conditions de pêche</h4>
+                    <p>Pêchez tôt le matin (6h–9h) ou en soirée (17h–20h) quand la température est plus fraîche et l'oxygène plus présent dans l'eau.</p>
+                </div>
+            </div>
+
+            <div class="conseil-grid">
+                <div class="conseil-mini">
+                    <span class="cm-icon">🌡️</span>
+                    <h4>Température idéale</h4>
+                    <p>Entre 15 et 22°C, les poissons sont actifs et s'alimentent. En dessous de 10°C, ils sont léthargiques et peu mordants.</p>
+                </div>
+                <div class="conseil-mini">
+                    <span class="cm-icon">🧪</span>
+                    <h4>pH et appâts</h4>
+                    <p>Un pH neutre (7–8) favorise l'activité des insectes aquatiques, nourriture naturelle des poissons. Adaptez vos appâts en conséquence.</p>
+                </div>
+                <div class="conseil-mini">
+                    <span class="cm-icon">💧</span>
+                    <h4>Eau claire = meilleure visibilité</h4>
+                    <p>Avec une turbidité &lt;50 NTU, les poissons voient mieux. Utilisez des leurres colorés ou des appâts naturels odorants.</p>
+                </div>
+                <div class="conseil-mini">
+                    <span class="cm-icon">⛈️</span>
+                    <h4>Après la pluie</h4>
+                    <p>La turbidité augmente après les pluies. Attendez 24–48h avant de pêcher pour que l'eau se clarifie et que les poissons reprennent leur activité normale.</p>
+                </div>
+                <div class="conseil-mini">
+                    <span class="cm-icon">♻️</span>
+                    <h4>Pêche responsable</h4>
+                    <p>Remettez à l'eau les poissons en dehors des périodes de pêche autorisées. Ne jetez rien dans l'eau et respectez les tailles minimales légales.</p>
+                </div>
+                <div class="conseil-mini">
+                    <span class="cm-icon">📍</span>
+                    <h4>Choisir sa zone</h4>
+                    <p>Évitez les zones en aval d'industries ou de champs cultivés. Préférez les zones en amont avec une eau plus pure et des paramètres stables.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ONGLET TUTORIEL APP ── -->
+        <div id="onglet-tuto" class="tab-panel">
+            <div class="section-titre">📱 Comment utiliser AquaSense</div>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h4>Choisir votre profil</h4>
+                        <p>Sur la page d'accueil, sélectionnez <strong>Pêcheur</strong> pour un suivi simplifié ou <strong>ONG/Scientifique</strong> pour un tableau de bord avancé avec statistiques.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h4>Consulter les données en temps réel</h4>
+                        <p>Les 3 cartes (Température, pH, Turbidité) se mettent à jour automatiquement toutes les <strong>3 secondes</strong>. La couleur indique l'état : vert = normal, orange = attention, rouge = danger.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h4>Voir les détails d'un capteur</h4>
+                        <p>Cliquez sur <strong>"Voir les détails des capteurs"</strong> pour accéder aux jauges visuelles et aux explications détaillées de chaque paramètre.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <h4>Gérer les alertes</h4>
+                        <p>La page <strong>Alertes</strong> liste toutes les anomalies détectées en temps réel avec leur niveau de gravité. Un son retentit automatiquement en cas de danger.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">5</div>
+                    <div class="step-content">
+                        <h4>Analyser l'historique</h4>
+                        <p>La page <strong>Historique</strong> affiche les graphiques des dernières mesures. Vous pouvez exporter toutes les données en CSV pour une analyse approfondie.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">6</div>
+                    <div class="step-content">
+                        <h4>Brancher le vrai capteur</h4>
+                        <p>Connectez l'ESP32 au WiFi (hotspot téléphone), téléversez <strong>esp32_code.ino</strong> et l'appareil enverra les vraies mesures pH à l'application automatiquement.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banner bleu" style="margin-top: 20px;">
+                <div class="banner-icon">📡</div>
+                <div>
+                    <h4>Déploiement terrain</h4>
+                    <p>Pour une utilisation sans WiFi, l'ESP32 peut être équipé d'un module GSM/4G (ex: SIM800L) pour transmettre les données via le réseau mobile depuis n'importe quelle zone isolée.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ONGLET FAQ ── -->
+        <div id="onglet-faq" class="tab-panel">
+            <div class="section-titre">❓ Questions fréquentes</div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Que faire si une alerte rouge s'affiche ? <i class="faq-arrow">▼</i>
+                </div>
+                <div class="faq-reponse">
+                    Rendez-vous sur la page Alertes pour identifier le paramètre en cause. Vérifiez que le capteur est bien immergé. Si la valeur est confirmée, éloignez les poissons de la zone et cherchez la source du problème. En cas de pollution, contactez l'OFB au 0800 006 020.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Les données sont-elles sauvegardées ? <i class="faq-arrow">▼</i>
+                </div>
+                <div class="faq-reponse">
+                    Oui ! Chaque mesure est enregistrée dans un fichier CSV. Vous pouvez consulter l'historique sur la page dédiée et exporter les données via le bouton "Exporter CSV".
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Pourquoi les valeurs ne se mettent pas à jour ? <i class="faq-arrow">▼</i>
+                </div>
+                <div class="faq-reponse">
+                    Vérifiez que les deux terminaux tournent : <strong>py app.py</strong> et <strong>py simulateur.py</strong>. Si vous utilisez l'ESP32 réel, vérifiez que le hotspot est activé et que l'ESP32 est bien connecté au WiFi (voyant LED stable).
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Comment calibrer le capteur pH ? <i class="faq-arrow">▼</i>
+                </div>
+                <div class="faq-reponse">
+                    Utilisez deux solutions tampon de pH connu (pH 4 et pH 7). Mesurez la tension renvoyée par le capteur dans chaque solution et ajustez les valeurs <strong>VOLTAGE_NEUTRE</strong> et <strong>PENTE</strong> dans le fichier esp32_code.ino. Recommencez la calibration toutes les 2–4 semaines.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Puis-je utiliser l'app sur mon téléphone ? <i class="faq-arrow">▼</i>
+                </div>
+                <div class="faq-reponse">
+                    Oui ! Si votre téléphone est connecté au même réseau WiFi que l'ordinateur qui fait tourner Flask, ouvrez simplement <strong>http://[IP-de-l'ordi]:5000</strong> dans votre navigateur mobile. L'interface est responsive.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Le son d'alerte ne fonctionne pas, que faire ? <i class="faq-arrow">▼</i>
+                </div>
+                <div class="faq-reponse">
+                    Vérifiez que le volume de votre appareil est activé. Les navigateurs bloquent parfois les sons automatiques : cliquez une fois sur la page pour "débloquer" l'audio, puis attendez une alerte.
+                </div>
+            </div>
         </div>
 
     </div>
@@ -69,6 +492,17 @@
         <a href="/tuto">💡 Conseils</a>
     </div>
 
+    <script>
+        function afficherOnglet(nom, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('onglet-' + nom).classList.add('active');
+            btn.classList.add('active');
+        }
+        function toggleFaq(el) {
+            el.parentElement.classList.toggle('open');
+        }
+    </script>
     <script src="/static/js/script.js"></script>
 </body>
 </html>
