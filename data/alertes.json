@@ -1,14 +1,8 @@
 [
   {
-    "type": "ph",
-    "niveau": "danger",
-    "message": "pH hors norme : 8.8",
-    "heure": "11:21"
-  },
-  {
-    "type": "turbidite",
-    "niveau": "danger",
-    "message": "Turbidite critique : 113.4 NTU",
+    "type": "temperature",
+    "niveau": "attention",
+    "message": "Temperature hors plage ideale : 27.8C",
     "heure": "11:21"
   }
 ]
