@@ -1,0 +1,119 @@
+/*
+ * HydraSense – ESP32 Code Final
+ * 
+ * Lit le capteur pH et envoie les données à l'app Flask
+ * via WiFi (hotspot téléphone).
+ * 
+ * ⚠️ AVANT LA DÉMO : modifier les 3 lignes dans la section
+ * "À MODIFIER" ci-dessous.
+ * 
+ * Branchement capteur pH :
+ *   - VCC  → 3.3V de l'ESP32
+ *   - GND  → GND de l'ESP32
+ *   - AOUT → GPIO34 de l'ESP32
+ * 
+ * Pour trouver l'IP de l'ordi :
+ *   1. Activer le hotspot sur le téléphone
+ *   2. Connecter l'ordi au hotspot
+ *   3. Taper "ipconfig" dans le terminal Windows
+ *   4. Copier l'adresse sous "Carte réseau sans fil"
+ */
+
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+// ── À MODIFIER AVANT LA DÉMO ──────────────────────────────────────────────────
+const char* ssid      = "NOM_DU_HOTSPOT";
+const char* password  = "MOT_DE_PASSE_HOTSPOT";
+const char* serverURL = "http://192.168.x.x:5000/donnees";
+// ─────────────────────────────────────────────────────────────────────────────
+
+const int PIN_PH = 34;
+
+const float VOLTAGE_REF    = 3.3;
+const float VOLTAGE_NEUTRE = 1.65;
+const float PENTE          = -5.5;
+
+const int INTERVALLE = 3000;
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+    Serial.println("\n🌊 HydraSense – Démarrage...");
+
+    WiFi.begin(ssid, password);
+    Serial.print("📶 Connexion au hotspot");
+
+    int tentatives = 0;
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+        tentatives++;
+        if (tentatives > 20) {
+            Serial.println("\n❌ Connexion WiFi impossible !");
+            Serial.println("→ Vérifiez le nom et mot de passe du hotspot.");
+            while (true) delay(1000);
+        }
+    }
+
+    Serial.println("\n✅ WiFi connecté !");
+    Serial.print("📍 IP ESP32 : ");
+    Serial.println(WiFi.localIP());
+    Serial.print("📤 Envoi vers : ");
+    Serial.println(serverURL);
+    Serial.println("\n── Démarrage des mesures ──");
+}
+
+float lirePH() {
+    int somme = 0;
+    for (int i = 0; i < 10; i++) {
+        somme += analogRead(PIN_PH);
+        delay(10);
+    }
+    float moyenne = somme / 10.0;
+    float voltage = moyenne * (VOLTAGE_REF / 4095.0);
+    float ph = 7.0 + ((voltage - VOLTAGE_NEUTRE) * PENTE);
+    return constrain(round(ph * 10) / 10.0, 0.0, 14.0);
+}
+
+void envoyerDonnees(float ph) {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("⚠️ WiFi perdu, reconnexion...");
+        WiFi.reconnect();
+        delay(2000);
+        return;
+    }
+
+    HTTPClient http;
+    http.begin(serverURL);
+    http.addHeader("Content-Type", "application/json");
+
+    String json = "{\"ph\": " + String(ph, 1) + "}";
+    int code = http.POST(json);
+
+    Serial.print("🧪 pH : ");
+    Serial.print(ph);
+
+    if (ph < 6.5 || ph > 8.5) {
+        Serial.print("  🔴 DANGER");
+    } else if (ph < 7.0 || ph > 8.0) {
+        Serial.print("  🟡 Attention");
+    } else {
+        Serial.print("  ✅ Normal");
+    }
+
+    if (code == 200) {
+        Serial.println("  → ✅ Envoyé");
+    } else {
+        Serial.print("  → ❌ Erreur HTTP ");
+        Serial.println(code);
+    }
+
+    http.end();
+}
+
+void loop() {
+    float ph = lirePH();
+    envoyerDonnees(ph);
+    delay(INTERVALLE);
+}
