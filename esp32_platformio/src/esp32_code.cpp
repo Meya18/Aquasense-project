@@ -23,9 +23,16 @@
 #include <HTTPClient.h>
 
 // ── À MODIFIER AVANT LA DÉMO ──────────────────────────────────────────────────
-const char* ssid      = "NOM_DU_HOTSPOT";
-const char* password  = "MOT_DE_PASSE_HOTSPOT";
-const char* serverURL = "http://192.168.x.x:5000/donnees";
+//#define HOME
+#ifdef HOME
+const char* ssid      = "bbap_9_2.4";
+const char* password  = "B3rTr4nd75";
+const char* serverURL = "http://192.168.1.129:5000/donnees";
+#else
+const char* ssid      = "Olivia";
+const char* password  = "123456789";
+const char* serverURL = "http://10.50.228.201:5000/donnees";
+#endif
 // ─────────────────────────────────────────────────────────────────────────────
 
 const int PIN_PH = 34;
@@ -41,8 +48,14 @@ void setup() {
     delay(1000);
     Serial.println("\n🌊 HydraSense – Démarrage...");
 
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect(true, true);
+    delay(500);
+    WiFi.setSleep(false);
+    WiFi.setAutoReconnect(true);
+    Serial.print("📶 Connexion au hotspot : ");
+    Serial.println(ssid);
     WiFi.begin(ssid, password);
-    Serial.print("📶 Connexion au hotspot");
 
     int tentatives = 0;
     while (WiFi.status() != WL_CONNECTED) {
@@ -51,7 +64,10 @@ void setup() {
         tentatives++;
         if (tentatives > 20) {
             Serial.println("\n❌ Connexion WiFi impossible !");
+            Serial.print("→ Réseau tenté : ");
+            Serial.println(ssid);
             Serial.println("→ Vérifiez le nom et mot de passe du hotspot.");
+            Serial.println("→ Vérifiez aussi que le hotspot est bien en 2.4 GHz et en WPA2.");
             while (true) delay(1000);
         }
     }
