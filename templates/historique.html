@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AquaSense – Historique</title>
+
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         .historique-page { padding-bottom: 90px; }
+
         .export-btn {
             display: block;
             margin: 0 auto 20px;
@@ -23,13 +26,16 @@
             text-align: center;
             max-width: 200px;
         }
+
         .export-btn:hover { background: #005599; }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85em;
             margin-top: 10px;
         }
+
         th {
             background: #e8f4fd;
             color: #0077cc;
@@ -37,178 +43,213 @@
             text-align: left;
             font-weight: 700;
         }
+
         td {
             padding: 8px 10px;
             border-bottom: 1px solid #e8f0f8;
             color: #1a2e4a;
             font-family: monospace;
         }
+
         tr:last-child td { border-bottom: none; }
     </style>
 </head>
+
 <body>
 
-    <header>
-        <img src="/static/images/icons/logo.png" alt="AquaSense" style="height: 40px;">
-        <p>📊 Historique</p>
-        <a href="javascript:history.back()" class="btn-retour">🔙 Retour</a>
-    </header>
+<header>
+    <img src="/static/images/icons/logo.png" alt="AquaSense" style="height: 40px;">
+    <p>📊 Historique</p>
+    <a href="javascript:history.back()" class="btn-retour">🔙 Retour</a>
+</header>
 
-    <div class="historique-page">
+<div class="historique-page">
 
-        <div class="graphique-container">
-            <h2>🌡️ Température (°C)</h2>
-            <canvas id="graphTemp"></canvas>
-        </div>
-
-        <div class="graphique-container">
-            <h2>🧪 pH</h2>
-            <canvas id="graphPh"></canvas>
-        </div>
-
-        <div class="graphique-container">
-            <h2>💧 Turbidité (NTU)</h2>
-            <canvas id="graphTurb"></canvas>
-        </div>
-
-        <!-- Tableau des données brutes -->
-        <div class="graphique-container">
-            <h2>📋 Données brutes</h2>
-            <div style="overflow-x:auto;">
-                <table id="tableau-historique">
-                    <thead>
-                        <tr>
-                            <th>Date / Heure</th>
-                            <th>Temp. °C</th>
-                            <th>pH</th>
-                            <th>Turb. NTU</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-historique">
-                        {% if history %}
-                            {% for row in history|reverse %}
-                            <tr>
-                                <td>{{ row.datetime }}</td>
-                                <td>{{ row.temperature }}</td>
-                                <td>{{ row.ph }}</td>
-                                <td>{{ row.turbidite }}</td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr><td colspan="4" style="text-align:center;color:#5a7a9a;padding:20px;">
-                                Aucune donnée enregistrée. Lancez le simulateur ou connectez l'ESP32.
-                            </td></tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <a href="/export-csv" class="export-btn">📥 Exporter CSV</a>
-
+    <!-- GRAPHIQUES -->
+    <div class="graphique-container">
+        <h2>🌡️ Température (°C)</h2>
+        <canvas id="graphTemp"></canvas>
     </div>
 
-    <div class="nav-bas">
-        <a href="/pecheur">🏠 Accueil</a>
-        <a href="/alertes">🔔 Alertes</a>
-        <a href="/historique">📊 Historique</a>
-        <a href="/tuto">💡 Conseils</a>
+    <div class="graphique-container">
+        <h2>🧪 pH</h2>
+        <canvas id="graphPh"></canvas>
     </div>
 
-    <script>
-        const labels   = [];
-        const tempData = [];
-        const phData   = [];
-        const turbData = [];
+    <div class="graphique-container">
+        <h2>💧 Turbidité (NTU)</h2>
+        <canvas id="graphTurb"></canvas>
+    </div>
 
-        const axesOpts = {
-            scales: {
-                y: { ticks: { color: '#1a2e4a' }, grid: { color: '#ddeeff' } },
-                x: { ticks: { color: '#1a2e4a', maxRotation: 45 }, grid: { color: '#ddeeff' } }
-            },
-            plugins: { legend: { labels: { color: '#1a2e4a' } } },
-            animation: { duration: 250 }
-        };
+    <!-- TABLEAU -->
+    <div class="graphique-container">
+        <h2>📋 Données brutes</h2>
 
-        const chartTemp = new Chart(document.getElementById('graphTemp'), {
-            type: 'line',
-            data: { labels, datasets: [{
-                label: 'Température °C',
-                data: tempData,
-                borderColor: '#e05252',
-                backgroundColor: 'rgba(224,82,82,0.1)',
-                tension: 0.4, pointRadius: 3, borderWidth: 2
-            }]},
-            options: axesOpts
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date / Heure</th>
+                        <th>Temp. °C</th>
+                        <th>pH</th>
+                        <th>Turb. NTU</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tbody-historique">
+                    <tr>
+                        <td colspan="4" style="text-align:center;color:#5a7a9a;padding:20px;">
+                            Chargement...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <a href="/export-csv" class="export-btn">📥 Exporter CSV</a>
+</div>
+
+<!-- NAV -->
+<div class="nav-bas">
+    <a href="/pecheur">🏠 Accueil</a>
+    <a href="/alertes">🔔 Alertes</a>
+    <a href="/historique">📊 Historique</a>
+    <a href="/tuto">💡 Conseils</a>
+</div>
+
+<script>
+const labels = [];
+const tempData = [];
+const phData = [];
+const turbData = [];
+
+const axesOpts = {
+    scales: {
+        y: { ticks: { color: '#1a2e4a' }, grid: { color: '#ddeeff' } },
+        x: { ticks: { color: '#1a2e4a', maxRotation: 45 }, grid: { color: '#ddeeff' } }
+    },
+    plugins: { legend: { labels: { color: '#1a2e4a' } } },
+    animation: { duration: 250 }
+};
+
+// GRAPHIQUES
+const chartTemp = new Chart(document.getElementById('graphTemp'), {
+    type: 'line',
+    data: { labels, datasets: [{
+        label: 'Température °C',
+        data: tempData,
+        borderColor: '#e05252',
+        tension: 0.4,
+        pointRadius: 3,
+        borderWidth: 2
+    }]},
+    options: axesOpts
+});
+
+const chartPh = new Chart(document.getElementById('graphPh'), {
+    type: 'line',
+    data: { labels, datasets: [{
+        label: 'pH',
+        data: phData,
+        borderColor: '#0077cc',
+        tension: 0.4,
+        pointRadius: 3,
+        borderWidth: 2
+    }]},
+    options: axesOpts
+});
+
+const chartTurb = new Chart(document.getElementById('graphTurb'), {
+    type: 'line',
+    data: { labels, datasets: [{
+        label: 'Turbidité NTU',
+        data: turbData,
+        borderColor: '#1aaa55',
+        tension: 0.4,
+        pointRadius: 3,
+        borderWidth: 2
+    }]},
+    options: axesOpts
+});
+
+// TABLEAU
+function mettreAJourTableau(rows) {
+    const tbody = document.getElementById('tbody-historique');
+
+    if (!rows || rows.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center;color:#5a7a9a;padding:20px;">
+                    Aucune donnée enregistrée.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = [...rows].reverse().map(row => `
+        <tr>
+            <td>${row.datetime}</td>
+            <td>${row.temperature}</td>
+            <td>${row.ph}</td>
+            <td>${row.turbidite}</td>
+        </tr>
+    `).join('');
+}
+
+// CHARGER HISTORIQUE
+function chargerHistorique() {
+    fetch('/historique-data')
+        .then(r => r.json())
+        .then(rows => {
+
+            mettreAJourTableau(rows);
+
+            const data = rows.slice(-30);
+
+            data.forEach(row => {
+                labels.push(row.datetime ? row.datetime.slice(11,16) : '');
+                tempData.push(parseFloat(row.temperature));
+                phData.push(parseFloat(row.ph));
+                turbData.push(parseFloat(row.turbidite));
+            });
+
+            chartTemp.update();
+            chartPh.update();
+            chartTurb.update();
         });
+}
 
-        const chartPh = new Chart(document.getElementById('graphPh'), {
-            type: 'line',
-            data: { labels, datasets: [{
-                label: 'pH',
-                data: phData,
-                borderColor: '#0077cc',
-                backgroundColor: 'rgba(0,119,204,0.1)',
-                tension: 0.4, pointRadius: 3, borderWidth: 2
-            }]},
-            options: axesOpts
+// LIVE UPDATE
+function mettreAJourGraphiques() {
+    fetch('/donnees')
+        .then(r => r.json())
+        .then(data => {
+            const now = new Date().toLocaleTimeString();
+
+            if (labels.length >= 30) {
+                labels.shift();
+                tempData.shift();
+                phData.shift();
+                turbData.shift();
+            }
+
+            labels.push(now);
+            tempData.push(data.temperature);
+            phData.push(data.ph);
+            turbData.push(data.turbidite);
+
+            chartTemp.update();
+            chartPh.update();
+            chartTurb.update();
         });
+}
 
-        const chartTurb = new Chart(document.getElementById('graphTurb'), {
-            type: 'line',
-            data: { labels, datasets: [{
-                label: 'Turbidité NTU',
-                data: turbData,
-                borderColor: '#1aaa55',
-                backgroundColor: 'rgba(26,170,85,0.1)',
-                tension: 0.4, pointRadius: 3, borderWidth: 2
-            }]},
-            options: axesOpts
-        });
+chargerHistorique();
+setInterval(mettreAJourGraphiques, 3000);
 
-        // ── Charger l'historique CSV au démarrage ──
-        function chargerHistorique() {
-            fetch('/historique-data')
-                .then(r => r.json())
-                .then(rows => {
-                    // Prendre les 30 dernières entrées
-                    const data = rows.slice(-30);
-                    data.forEach(row => {
-                        labels.push(row.datetime ? row.datetime.slice(11, 16) : '');
-                        tempData.push(parseFloat(row.temperature));
-                        phData.push(parseFloat(row.ph));
-                        turbData.push(parseFloat(row.turbidite));
-                    });
-                    chartTemp.update();
-                    chartPh.update();
-                    chartTurb.update();
-                })
-                .catch(err => console.warn('Historique non disponible :', err));
-        }
+</script>
 
-        // ── Ajouter les nouvelles mesures en live ──
-        function mettreAJourGraphiques() {
-            fetch('/donnees')
-                .then(r => r.json())
-                .then(data => {
-                    const now = new Date().toLocaleTimeString();
-                    if (labels.length >= 30) {
-                        labels.shift(); tempData.shift(); phData.shift(); turbData.shift();
-                    }
-                    labels.push(now);
-                    tempData.push(data.temperature);
-                    phData.push(data.ph);
-                    turbData.push(data.turbidite);
-                    chartTemp.update();
-                    chartPh.update();
-                    chartTurb.update();
-                })
-                .catch(err => console.warn('Erreur :', err));
-        }
-
-        // Charger d'abord l'historique, puis démarrer le live
-        chargerHistorique();
-        setInterval(mettreAJourGraphiques, 3000);
-    </script>
 </body>
 </html>
