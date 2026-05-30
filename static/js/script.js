@@ -124,11 +124,19 @@ setInterval(mettreAJour, 3000);
 mettreAJour();
 
 
-<<<<<<< Updated upstream
 new Notification("⚠️ AquaSense", {
     body: "Température critique détectée !",
     icon: "/static/img/warning.png"
 });
+
+// ─────────────────────────────
+// permission notif propre
+// ─────────────────────────────
+document.addEventListener("click", () => {
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+}, { once: true });
 
 const audio = new Audio('/static/alert.mp3');
 audio.play();
@@ -145,13 +153,3 @@ zones.forEach(pos => {
 if (color === "red") {
     new Notification("⚠️ Zone polluée détectée !");
 }
-=======
-// ─────────────────────────────
-// permission notif propre
-// ─────────────────────────────
-document.addEventListener("click", () => {
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-}, { once: true });
->>>>>>> Stashed changes
