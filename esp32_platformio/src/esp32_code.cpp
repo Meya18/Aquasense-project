@@ -23,16 +23,27 @@
 #include <HTTPClient.h>
 
 // ── À MODIFIER AVANT LA DÉMO ──────────────────────────────────────────────────
-const char* ssid      = "NOM_DU_HOTSPOT";
-const char* password  = "MOT_DE_PASSE_HOTSPOT";
-const char* serverURL = "http://192.168.x.x:5000/donnees";
+#define HOME
+#ifdef HOME
+const char* ssid      = "bbap_9_2.4";
+const char* password  = "B3rTr4nd75";
+const char* serverURL = "http://192.168.1.129:5000/donnees";
+#else
+const char* ssid      = "Olivia";
+const char* password  = "123456789";
+const char* serverURL = "http://10.50.228.201:5000/donnees";  // Ligne à changer si l'IP du PC n'est plus la même. Verifier avec "ipconfig" dans le terminal Windows.   
+#endif
 // ─────────────────────────────────────────────────────────────────────────────
 
 const int PIN_PH = 34;
+const int PIN_LED_DANGER = 25;
 
 const float VOLTAGE_REF    = 3.3;
 const float VOLTAGE_NEUTRE = 1.65;
 const float PENTE          = -5.5;
+// Compensation factor for divider (AO -> R1 -> node -> R2+R3 -> GND)
+// If node = k * Vsensor then COMPENSATION = 1/k. For R1=1k, R2+R3=2k, k=2/3 -> comp=1.5
+const float DIV_COMP       = 1.5;
 
 const int INTERVALLE = 3000;
 
@@ -41,8 +52,14 @@ void setup() {
     delay(1000);
     Serial.println("\n🌊 HydraSense – Démarrage...");
 
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect(true, true);
+    delay(500);
+    WiFi.setSleep(false);
+    WiFi.setAutoReconnect(true);
+    Serial.print("📶 Connexion au hotspot : ");
+    Serial.println(ssid);
     WiFi.begin(ssid, password);
-    Serial.print("📶 Connexion au hotspot");
 
     int tentatives = 0;
     while (WiFi.status() != WL_CONNECTED) {
@@ -51,7 +68,10 @@ void setup() {
         tentatives++;
         if (tentatives > 20) {
             Serial.println("\n❌ Connexion WiFi impossible !");
+            Serial.print("→ Réseau tenté : ");
+            Serial.println(ssid);
             Serial.println("→ Vérifiez le nom et mot de passe du hotspot.");
+            Serial.println("→ Vérifiez aussi que le hotspot est bien en 2.4 GHz et en WPA2.");
             while (true) delay(1000);
         }
     }
@@ -62,16 +82,25 @@ void setup() {
     Serial.print("📤 Envoi vers : ");
     Serial.println(serverURL);
     Serial.println("\n── Démarrage des mesures ──");
+
+    pinMode(PIN_PH, INPUT);
+    pinMode(PIN_LED_DANGER, OUTPUT);
+    digitalWrite(PIN_LED_DANGER, LOW);
+    analogReadResolution(12);
+    analogSetPinAttenuation(PIN_PH, ADC_11db);
 }
 
-float lirePH() {
+float lirePH(int &raw, float &voltage) {
     int somme = 0;
     for (int i = 0; i < 10; i++) {
         somme += analogRead(PIN_PH);
         delay(10);
     }
     float moyenne = somme / 10.0;
-    float voltage = moyenne * (VOLTAGE_REF / 4095.0);
+    raw = round(moyenne);
+    float voltage_adc = moyenne * (VOLTAGE_REF / 4095.0);
+    // Compensate for voltage divider between sensor AO and ADC node
+    voltage = voltage_adc * DIV_COMP; // voltage = estimated sensor voltage
     float ph = 7.0 + ((voltage - VOLTAGE_NEUTRE) * PENTE);
     return constrain(round(ph * 10) / 10.0, 0.0, 14.0);
 }
@@ -113,7 +142,27 @@ void envoyerDonnees(float ph) {
 }
 
 void loop() {
-    float ph = lirePH();
+    int raw = 0;
+    float voltage = 0.0;
+    float ph = lirePH(raw, voltage);
+    bool danger = (ph < 6.5 || ph > 8.5);
+
+    digitalWrite(PIN_LED_DANGER, danger ? HIGH : LOW);
+
+    Serial.print("ADC brut : ");
+    Serial.print(raw);
+    Serial.print("  Tension : ");
+    Serial.print(voltage, 3);
+    Serial.print(" V  |  ");
+
+    if (danger) {
+        Serial.print("🔴 DANGER  ");
+    } else if (ph < 7.0 || ph > 8.0) {
+        Serial.print("🟡 Attention  ");
+    } else {
+        Serial.print("✅ Normal  ");
+    }
+
     envoyerDonnees(ph);
     delay(INTERVALLE);
 }
