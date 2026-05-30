@@ -1,8 +1,8 @@
 [
   {
-    "type": "ph",
-    "niveau": "danger",
-    "message": "pH hors norme : 10.1",
-    "heure": "14:46"
+    "type": "temperature",
+    "niveau": "attention",
+    "message": "Temperature hors plage ideale : 22.1C",
+    "heure": "15:17"
   }
 ]

@@ -73,9 +73,27 @@ def charger_historique():
     if not os.path.isfile(CSV_PATH):
         return rows
     with open(CSV_PATH, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            rows.append(row)
+        premiere_ligne = f.readline().strip()
+        f.seek(0)
+        if premiere_ligne.startswith("datetime"):
+            # CSV avec en-tête
+            reader = csv.DictReader(f)
+            for row in reader:
+                rows.append(row)
+        else:
+            # CSV sans en-tête (format de ta camarade)
+            reader = csv.reader(f)
+            for row in reader:
+                if len(row) == 4:
+                    try:
+                        rows.append({
+                            "datetime":    row[0],
+                            "temperature": row[1],
+                            "ph":          row[2],
+                            "turbidite":   row[3]
+                        })
+                    except Exception:
+                        pass  # ignore les lignes malformées (marqueurs Git, etc.)
     return rows[-50:]
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -142,4 +160,3 @@ def historique_data():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-
